@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bcvxc.github.io/sitemap.xml
