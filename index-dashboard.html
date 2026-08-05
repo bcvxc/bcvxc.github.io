@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="baidu-site-verification" content="codeva-AJZjtIsFyg" />
+<meta name="google-site-verification" content="I9HVd1hV5U-1LGjoE9bRqLh6Hz3pAj3pMVxRYvr7npw" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cxcx1.1 流量与收入看板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0A1A2F;--card:#0F2440;--surface:#152D50;--cyan:#00D4FF;--pink:#FF6B9D;--amber:#F7DC6F;--text:#E8EEF4;--muted:#8AA4BF;--border:rgba(0,212,255,.2);--radius:16px}
+body{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 20px}
+.bg{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(0,212,255,.06),transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(255,107,157,.04),transparent 50%);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;max-width:900px;margin:0 auto}
+h1{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:4px}
+h1 .a{background:linear-gradient(135deg,var(--cyan),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);font-size:14px;margin-bottom:32px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.stat .v{font-size:32px;font-weight:800;color:var(--cyan)}
+.stat .l{font-size:12px;color:var(--muted);margin-top:4px}
+.stat.gold .v{color:var(--amber)}
+.stat.pink .v{color:var(--pink)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.panel h3{font-size:16px;margin-bottom:16px;color:var(--text)}
+.panel p{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+td{color:var(--text)}
+tr:hover td{background:rgba(0,212,255,.03)}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--pink));color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,212,255,.3)}
+.inp{width:100%;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:inherit;margin-bottom:8px}
+.inp:focus{border-color:var(--cyan)}
+.row2{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px}
+.tag.g{background:rgba(0,212,255,.1);color:var(--cyan)}
+.tag.y{background:rgba(247,220,111,.1);color:var(--amber)}
+.tag.r{background:rgba(255,107,157,.15);color:var(--pink)}
+footer{text-align:center;padding:32px 0;font-size:12px;color:var(--muted)}
+@media(max-width:600px){h1{font-size:24px}.row{grid-template-columns:repeat(2,1fr)}}
+</style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1102598968306822" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="bg"></div>
+<div class="container">
+<h1><span class="a">cxcx1.1</span> 数据中心</h1>
+<p class="sub">流量统计 · 收入估算 · 工具使用情况</p>
+
+<div class="row" id="statsRow">
+<div class="stat"><div class="v" id="totalPv">0</div><div class="l">累计访问</div></div>
+<div class="stat"><div class="v" id="todayPv">0</div><div class="l">今日访问</div></div>
+<div class="stat"><div class="v" id="estRevenue">$0</div><div class="l">预估收入</div></div>
+<div class="stat gold"><div class="v" id="estMonthly">$0</div><div class="l">月预估</div></div>
+</div>
+
+<div class="panel">
+<h3>工具使用排行</h3>
+<table id="toolTable">
+<thead><tr><th>工具</th><th>访问次数</th><th>占比</th><th>预估收入</th></tr></thead>
+<tbody id="toolBody"></tbody>
+</table>
+</div>
+
+<div class="panel">
+<h3>每日记录</h3>
+<p>在下面记录每天的实际访问量和收入，用于追踪趋势。</p>
+<div class="row2">
+<input class="inp" id="dateInput" type="date" style="flex:1;min-width:140px">
+<input class="inp" id="pvInput" type="number" placeholder="日访问量" style="flex:1;min-width:100px">
+<input class="inp" id="revInput" type="number" step="0.01" placeholder="日收入 ($)" style="flex:1;min-width:120px">
+<button class="btn" id="logBtn" style="padding:10px 20px;width:auto">记录</button>
+</div>
+<div style="margin-top:8px;max-height:240px;overflow-y:auto" id="logList"></div>
+</div>
+
+<div class="panel">
+<h3>快速参考</h3>
+<table>
+<tr><td>预估 CPM</td><td>$2.00 - $5.00</td></tr>
+<tr><td>1000 访问日收入</td><td>$2.00 - $5.00</td></tr>
+<tr><td>月收入 (2站×日1000)</td><td>$60 - $150</td></tr>
+<tr><td>提现门槛</td><td>$100 (AdSense)</td></tr>
+<tr><td>收款银行</td><td>中国银行 6217857000104705528</td></tr>
+</table>
+</div>
+
+<footer>cxcx1.1 · 数据存储在本地 localStorage · 可在新设备间手动迁移</footer>
+</div>
+
+<script>
+(function(){
+function l(s,d){try{return JSON.parse(localStorage.getItem(s)||d)}catch{return d}}
+function sv(s,v){localStorage.setItem(s,JSON.stringify(v))}
+function incr(k){try{localStorage.setItem(k,(parseInt(localStorage.getItem(k)||'0')+1).toString())}catch{}}
+incr('dash-pv');
+const today=new Date().toISOString().slice(0,10);
+const daily=l('daily',{});
+const logs=l('logs',[]);
+
+// 统计今日PV
+let todayTotal=0;
+Object.keys(daily).forEach(function(d){
+if(d.startsWith('pv-'+today))todayTotal+=daily[d]|0;
+});
+
+// 计算总数
+let totalPv=0,estRev=0,monthRev=0;
+const toolStats={};
+Object.keys(daily).forEach(function(k){
+if(k.startsWith('pv-')){const v=daily[k]|0;totalPv+=v;
+const tn=k.replace('pv-','');
+toolStats[tn]=(toolStats[tn]||0)+v;}
+});
+
+document.getElementById('totalPv').textContent=totalPv;
+document.getElementById('todayPv').textContent=todayTotal;
+const rev=totalPv*0.0035; // 假设CPM $3.5
+document.getElementById('estRevenue').textContent='$'+rev.toFixed(2);
+document.getElementById('estMonthly').textContent='$'+(rev<10?60:Math.max(60,rev)).toFixed(0);
+
+// 工具排行
+const tb=document.getElementById('toolBody');
+const tools={toolsite:'ToolsBox',ai:'AnimeForge',img:'PicPress',qr:'QR Lab'};
+const sorted=Object.entries(toolStats).sort(function(a,b){return b[1]-a[1]});
+if(sorted.length===0){
+tb.innerHTML='<tr><td colspan="4" style="color:var(--muted);text-align:center">还没有数据，访问工具站后自动记录</td></tr>';
+}else{
+sorted.forEach(function(e){
+const tr=document.createElement('tr');
+const pct=(e[1]/totalPv*100).toFixed(1);
+const r=(e[1]*0.0035).toFixed(2);
+tr.innerHTML='<td>'+(tools[e[0]]||e[0])+'</td><td>'+e[1]+'</td><td>'+pct+'%</td><td>$'+r+'</td>';
+tb.appendChild(tr);
+});
+}
+
+// 每日日志
+document.getElementById('dateInput').value=today;
+function renderLogs(){
+const ll=document.getElementById('logList');
+if(logs.length===0){ll.innerHTML='<div style="color:var(--muted);font-size:13px">暂无记录</div>';return}
+let h='<table><thead><tr><th>日期</th><th>访问</th><th>收入</th></tr></thead><tbody>';
+logs.slice().reverse().forEach(function(l){
+h+='<tr><td>'+l.d+'</td><td>'+l.pv+'</td><td>$'+(l.rev||'0').toFixed(2)+'</td></tr>';
+});
+h+='</tbody></table>';
+ll.innerHTML=h;
+}
+renderLogs();
+
+document.getElementById('logBtn').addEventListener('click',function(){
+const d=document.getElementById('dateInput').value;
+const pv=parseInt(document.getElementById('pvInput').value)||0;
+const rev=parseFloat(document.getElementById('revInput').value)||0;
+if(!d)return;
+logs.push({d:d,pv:pv,rev:rev});
+sv('logs',logs);
+// 也更新日PV
+daily['pv-'+d]=(daily['pv-'+d]||0)+pv;
+sv('daily',daily);
+document.getElementById('pvInput').value='';
+document.getElementById('revInput').value='';
+renderLogs();
+location.reload();
+});
+})();
+</script>
+</body>
+</html>
